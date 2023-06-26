@@ -1,4 +1,4 @@
-package enea.dgs.multiknockknock;
+package enea.dgs.server;
 
 /*
  * Copyright (c) 1995, 2013, Oracle and/or its affiliates. All rights reserved.
@@ -53,14 +53,13 @@ public class KKMultiServerThread extends Thread {
 
     public void run() {
 
-        try (PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));) {
+        try (PrintWriter out = new PrintWriter(socket.getOutputStream(), true); BufferedReader in = new BufferedReader(
+                new InputStreamReader(socket.getInputStream()));) {
 
-            ClientMessageObserver messageObserver = ClientMessageObserver.of(
-                    (clientID, message) -> {
-                        if (!identifier.equals(clientID))
-                            out.println(clientID + ": " + message);
-                    });
+            ClientMessageObserver messageObserver = ClientMessageObserver.of((clientID, message) -> {
+                if (!identifier.equals(clientID))
+                    out.println(clientID + ": " + message);
+            });
             messageObserver.attach();
 
             String inputLine;

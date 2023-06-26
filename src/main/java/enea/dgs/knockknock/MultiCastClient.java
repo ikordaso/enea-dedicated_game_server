@@ -1,36 +1,5 @@
 package enea.dgs.knockknock;
 
-/*
- * Copyright (c) 1995, 2013, Oracle and/or its affiliates. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *   - Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *
- *   - Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *
- *   - Neither the name of Oracle or the names of its
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- * IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -40,23 +9,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 /**
- * Client implementation using the UDP broadcast to find a server network location.
+ * Client implementation using the UDP multicast to find a server network location.
  */
-public class KnockKnockClient {
+public class MultiCastClient {
 
     private static final byte[] BUFFER = new byte[256];
 
     public static void main(String[] args) throws IOException {
-
         InetAddress address;
         String receivedData;
-        // in case multiple clients try to bind the same address and port exception will occur for the second client
-        // (Address already in use), therefore "Reuse" flag is used in order to counter the problem
-        // (https://docs.oracle.com/javase/8/docs/api/java/net/DatagramSocket.html#setReuseAddress-boolean-)
-//        try (DatagramSocket socket = new DatagramSocket(6666)) {
-        try (DatagramSocket socket = new DatagramSocket(null)) {
-            socket.setReuseAddress(true);
-            socket.bind(new InetSocketAddress(6666));
+        InetAddress group = InetAddress.getByName("239.255.255.255");
+        try (MulticastSocket socket = new MulticastSocket(6666)) {
+            socket.joinGroup(group);
             DatagramPacket packet = new DatagramPacket(BUFFER, BUFFER.length);
             socket.receive(packet);
 

@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 /**
  * Class representing an observer watching for messages from other clients.
  */
-public class ClientMessageObserver implements PropertyChangeListener {
+public class ClientMessageObserver implements IClientMessageObserver {
 
     private final BiConsumer<String, String> messageConsumer;
 
@@ -42,31 +42,9 @@ public class ClientMessageObserver implements PropertyChangeListener {
      */
     public void detach() { ClientMessageObservable.getInstance().removeObserver(this); }
 
-    /**
-     * In case the provided logic is not {@code null}, observer attaches to the  observable bus,
-     * triggers logic execution and finishes with observer detachment from the observable bus.
-     *
-     * @param logic {@link Runnable} instance
-     */
-    public void executeWrapped(Runnable logic) {
-        if (Objects.isNull(logic))
-            return;
-
-        attach();
-        logic.run();
-        detach();
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Executes set message consumer with the triggered event values.
-     */
     @Override
-    public void propertyChange(final PropertyChangeEvent propertyChangeEvent) {
-        if (Objects.nonNull(propertyChangeEvent) && Objects.nonNull(propertyChangeEvent.getNewValue()))
-            messageConsumer.accept((String) propertyChangeEvent.getOldValue(),
-                    (String) propertyChangeEvent.getNewValue());
+    public void onMessageReceived(final String clientID, final String message) {
+        if (Objects.nonNull(clientID) && Objects.nonNull(message))
+            messageConsumer.accept(clientID, message);
     }
-
 }

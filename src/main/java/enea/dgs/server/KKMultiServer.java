@@ -1,4 +1,4 @@
-package enea.dgs.multiknockknock;
+package enea.dgs.server;
 
 /*
  * Copyright (c) 1995, 2013, Oracle and/or its affiliates. All rights reserved.
@@ -41,13 +41,17 @@ public class KKMultiServer {
 
     public static void main(String[] args) throws IOException {
 
-        if (args.length != 1) {
-            System.err.println("Usage: java KKMultiServer <port number>");
+        if (args.length != 2) {
+            System.err.println("Usage: java KKMultiServer <port number> <name>");
             System.exit(1);
         }
 
         int portNumber = Integer.parseInt(args[0]);
+        String serverName = args[1];
         boolean listening = true;
+
+        LocationBroadcast broadcast = new LocationBroadcast(portNumber, serverName);
+        broadcast.start();
 
         try (ServerSocket serverSocket = new ServerSocket(portNumber)) {
             while (listening) {
@@ -55,6 +59,7 @@ public class KKMultiServer {
             }
         } catch (IOException e) {
             System.err.println("Could not listen on port " + portNumber);
+            broadcast.stopBroadcasting();
             System.exit(-1);
         }
     }
